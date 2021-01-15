@@ -1,0 +1,61 @@
+<div class="container-fluid" id="admin">
+
+    <!--Formulaire produit-->
+    <div class="container" id="addproduct">
+        <div class="row">
+            <div class="col">
+                <form class="formajout" method="POST" action="/admin" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>Image</label>
+                        <input type="file" class="form-control" name="image">
+                    </div>
+                    <div class="form-group">
+                        <label>marque</label>
+                        <input type="text" class="form-control" name="marque">
+                    </div>
+                    <div class="form-group">
+                        <label>modele</label>
+                        <input type="text" class="form-control" name="modele">
+                    </div>
+                    <div class="form-group">
+                        <label>prix</label>
+                        <input type="text" class="form-control" name="prix">
+                    </div>
+                    <button type="submit" class="btn btn-primary">submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!--affichage produit-->
+    <div class="container listeproduct">
+        <h3>Liste des chaussures</h3>
+        <div class="row">
+{{#each product}}
+            <div class="col-md-3">
+                
+                <div class="card">
+                    <img class="card-img-top" src="{{this.image.path}}" alt="">
+                    <div class="card-body">
+                        <h4 class="card-title">{{this.marque}}</h4>
+                        <h5 class="card-title2">{{this.modele}}</h5>
+                        <p class="card-text">{{this.description}}</p>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">{{this.prix}}</li>
+                    </ul>
+                    <div class="card-body">
+                        <form action="{{this._id}}/?_method=DELETE" method="POST">
+                            <button type="submit" class="btn-effacer">efface</button>
+                            <button class="btn-modifier"><a href="{{this.id}}">Modifier</a></button>
+                        </form>
+                    </div>
+                </div>
+                
+            </div>
+{{/each}}
+
+        </div>
+    </div>
+</div>
