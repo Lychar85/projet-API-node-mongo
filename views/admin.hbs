@@ -10,8 +10,12 @@
                         <input type="file" class="form-control" name="image">
                     </div>
                     <div class="form-group">
-                        <label>marque</label>
-                        <input type="text" class="form-control" name="marque">
+                        <label for="exampleFormControlSelect">Marques</label>
+                        <select class="form-control" name="marques" id="exampleFormControlSelect">
+                            {{#each marques}}
+                            <option value="{{this._id}}">{{this.type}}</option>
+                            {{/each}}
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>modele</label>
@@ -21,7 +25,7 @@
                         <label>prix</label>
                         <input type="text" class="form-control" name="prix">
                     </div>
-                    <button type="submit" class="btn btn-primary">submit</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
                 </form>
             </div>
         </div>
@@ -32,18 +36,18 @@
     <div class="container listeproduct">
         <h3>Liste des chaussures</h3>
         <div class="row">
-{{#each product}}
+            {{#each product}}
             <div class="col-md-3">
-                
+
                 <div class="card">
                     <img class="card-img-top" src="{{this.image.path}}" alt="">
                     <div class="card-body">
-                        <h4 class="card-title">{{this.marque}}</h4>
+                        <h4 class="card-title">{{this.marques.type}}</h4>
                         <h5 class="card-title2">{{this.modele}}</h5>
                         <p class="card-text">{{this.description}}</p>
                     </div>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">{{this.prix}}</li>
+                        <li class="list-group-item">{{this.prix}}€</li>
                     </ul>
                     <div class="card-body">
                         <form action="{{this._id}}/?_method=DELETE" method="POST">
@@ -52,9 +56,9 @@
                         </form>
                     </div>
                 </div>
-                
+
             </div>
-{{/each}}
+            {{/each}}
 
         </div>
     </div>

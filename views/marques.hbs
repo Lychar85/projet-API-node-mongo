@@ -1,0 +1,50 @@
+<a href="/admin">panier</a>
+<div class="container-fluid">
+    <div style="display: flex; flex-direction: center; justify-content: space-around; align-items:center; height: 1000px"
+        class="row">
+        <!-- GET -->
+        
+        <div class="col-md-6">
+            <h3>Liste des marques</h3>
+            <div class="card">
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {{#each marques}}
+                            
+                        <li class="list-group-item">
+                            {{this.type}}
+                                        
+                        </li>
+                        </form>
+
+                        </li>
+                        {{/each}}
+                        <form action="/?_method=PUT" method="POST">
+                            <div style="margin-top: 1rem">
+                                <button type="submit" class="btn btn-danger">tout effacer </button>
+                            </div>
+                        </form>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- POST -->
+        <div class="col-md-6">
+            <h3>Ajouter une marques</h3>
+            <div class="card">
+                <div class="card-body">
+
+                    <form class="formajout" method="POST" action="/marques">
+                        <div class="form-group">
+                            <label>marques</label>
+                            <input type="text" class="form-control" name="type">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                    </form>
+
+
+                </div>
+            </div>
+        </div>

@@ -1,0 +1,30 @@
+<!--Formulaire produit-->
+    <div class="container" id="addproduct">
+        <div class="row">
+            <div class="col">
+                <form class="formajout" method="POST" action="/admin" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>Image</label>
+                        <input type="file" class="form-control" name="image">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleFormControlSelect">Marques</label>
+                        <select class="form-control" name="marques" id="exampleFormControlSelect">
+                            {{#each marques}}
+                            <option value="{{this._id}}">{{this.type}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>modele</label>
+                        <input type="text" class="form-control" name="modele" value="{{modele}}">
+                    </div>
+                    <div class="form-group">
+                        <label>prix</label>
+                        <input type="text" class="form-control" name="prix" value="{{price}}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </form>
+            </div>
+        </div>
+    </div>

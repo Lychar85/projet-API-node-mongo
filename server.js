@@ -71,7 +71,10 @@
     //modele---------------------------------------------------
     const productSchema = {
         modele: String,
-        marque: String,
+        marques: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "marques"
+        },
         description: String,
         prix: Number,
         image: {
@@ -79,42 +82,49 @@
             originalName: String,
             path: String,
             creatAt: Date
-        }
+        },
     }
+    const marquesModel = {
+        type: String
+    };
+
     const product = mongoose.model("product", productSchema);
-
-
-
-
-
-
-
-
-
-
-
+    const marques = mongoose.model("marques", marquesModel);
 
 
     //route admin---------------------
-    app.route('/admin')
-        .get((req, res) => {
-            product.find((err, docs) => {
+    app.route("/admin")
+    .get((req, res) => {
+        product
+            .find()
+            .populate("marques")
+            .exec((err, docs) => {
                 if (!err) {
-                    res.render('admin', {
-                        product: docs
+
+                    marques.find((err, cat) => {
+                        res.render('admin', {
+                            product: docs,
+                            marques: cat
+                        })
                     })
+
+
+                } else {
+                    res.send('err')
                 }
             })
-        })
+    })
+
+
 
         .post(upload.single('image'), (req, res) => {
             const file = req.file;
 
             const newProduct = new product({
                 modele: req.body.modele,
-                marque: req.body.marque,
                 description: req.body.description,
                 prix: req.body.prix,
+                marques: req.body.marques
             });
             if (file) {
                 newProduct.image = {
@@ -131,16 +141,97 @@
                     res.send(err)
                 }
             })
+        });
+
+// route marques--------------------------------------------
+app.route("/marques")
+    .get((req, res) => {
+
+
+        marques.find((err, cat) => {
+            if (!err) {
+                res.render('marques', {
+                    marques: cat
+                })
+            } else {
+                res.send('err')
+            }
         })
+    })
 
+    .post((req, res) => {
+        const newMarques = new marques({
+            type: req.body.type
+        })
+        newMarques.save((err) => {
+            if (!err) {
+                res.redirect("/marques")
+            } else res.send(err)
+        });
+    });
 
+//route ID--------------------------------------------
+app.route('/:id')
+    .get((req, res) => {
+        product.findOne({
+            _id: req.params.id
+        }, (err, docs) => {
+            if (!err) {
+                marques.find((err, cat) => {
+                    res.render('edition', {
+                        _id: docs.id,
+                        modele: docs.modele,
+                        price: docs.price,
+                        marques: cat,
+                    })
+                })
 
+            } else {
+                res.send(err)
+            }
+        })
+    })
 
+    //METTRE A JOUR-------- 
+    .put((req, res) => {
+        product.updateOne(
+            //condition------------
+            {
+                _id: req.params.id
+            },
+            //update------------
+            {
+                modele: req.body.modele,
+                price: req.body.price,
+                marques: req.body.marques,
+            },
+            //option------------
+            {
+                multi: true
+            },
 
+            (err) => {
+                if (!err) {
+                    res.redirect('/admin')
+                } else {
+                    res.send(err)
+                }
+            }
+        )
+    })
 
+    .delete((req, res) => {
+        product.deleteOne({
+            _id: req.params.id
+        }, (err, ) => {
+            if (!err) {
+                res.redirect('/admin')
 
-
-
+            } else {
+                res.send(err)
+            }
+        })
+    });
 
     //OUVRE LE PORT 3000--------------------------------------------
     app.listen(port, function () {
