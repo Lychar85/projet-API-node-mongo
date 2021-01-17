@@ -233,6 +233,28 @@ app.route('/:id')
         })
     });
 
+        //route admin---------------------
+        app.route("/")
+        .get((req, res) => {
+            product
+                .find()
+                .populate("marques")
+                .exec((err, docs) => {
+                    if (!err) {
+    
+                        marques.find((err, cat) => {
+                            res.render('index', {
+                                product: docs,
+                                marques: cat
+                            })
+                        })
+    
+    
+                    } else {
+                        res.send('err')
+                    }
+                })
+        })
     
 
     //OUVRE LE PORT 3000--------------------------------------------

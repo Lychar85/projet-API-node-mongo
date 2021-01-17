@@ -1,0 +1,67 @@
+<div class="header-top"></div>
+
+
+<div class="sidebar-container">
+  <div class="sidebar-logo">
+    NIKE STORE
+  </div>
+  <ul class="sidebar-navigation">
+    <li>
+      <a href="/">
+        <img src="https://img.icons8.com/material-rounded/24/000000/home.png"/>Accueil
+      </a>
+    </li>
+    <li>
+      <a href="/admin">
+        <img src="https://img.icons8.com/material/24/000000/dashboard-layout.png"/>Tableau de bord 
+      </a>
+    </li>
+    <li class="header"></li>
+    <li class="active">
+      <a href="/admin">
+        <img src="https://img.icons8.com/ios-glyphs/24/000000/delivery--v1.png"/>Mes commandes
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <img src="https://img.icons8.com/ios-filled/24/000000/shopping-cart-loaded.png"/>Mon panier
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <img src="https://img.icons8.com/ios-glyphs/24/000000/user-male-circle.png"/>Mon Compte
+      </a>
+    </li>
+</ul>
+</div>
+      
+    <!--affichage produit-->
+    <div class="container listeproduct">
+        <h3>Liste des chaussures</h3>
+        <div class="row">
+            {{#each product}}
+            <div class="col-md-4 card-type">
+
+                <div class="card card-product">
+                    <img class="card-img-top" src="{{this.image.path}}" alt="">
+                    <div class="card-body">
+                        <h4 class="card-title">{{this.marques.type}}</h4>
+                        <h5 class="card-title2">{{this.modele}}</h5>
+                        <p class="card-text">{{this.description}}</p>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">{{this.prix}}€</li>
+                    </ul>
+                    <div class="card-body-btn">
+                        <form action="{{this._id}}/?_method=DELETE" method="POST">
+                            <button type="submit" class="btn-add">Ajouter au panier</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+            {{/each}}
+
+        </div>
+    </div>
+</div>
