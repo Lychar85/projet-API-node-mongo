@@ -1,117 +1,113 @@
+const
+    express = require('express'),
+    app = express(),
+    port = 3000,
+    mongoose = require("mongoose"),
+    methodOverride = require('method-override'),
+    bodyParser = require("body-parser");
+//IMAGE-------------------------------------------------------------
+const
+    multer = require('multer'),
+    path = require('path');
+app.use(express.static(__dirname + "/public"));
 
-
-    const
-        express = require('express'),
-        app = express(),
-        port = 3000,
-        mongoose = require("mongoose"),
-        methodOverride = require('method-override'),
-        bodyParser = require("body-parser");
-    //IMAGE------------------------------------------------------
-    const
-        multer = require('multer'),
-        path = require('path');
-    app.use(express.static(__dirname + "/public"));
-
-    //ajout image--------------------------------------------
-    const storage = multer.diskStorage({
-            destination: (req, file, cb) => {
-                console.log(file);
-                cb(null, './public/uploads')
-            },
-            filename: (req, file, cb) => {
-                cb(null, Date.now() + '_' + file.originalname)
-            },
-        }),
-        //filtre image-----------
-        upload = multer({
-            storage: storage,
-            /*limits: {
-                fileSize: 1
-            },*/
-            fileFilter: (req, file, cb) => {
-                if (
-                    file.mimetype === 'image/png' ||
-                    file.mimetype === 'image/jpeg' ||
-                    file.mimetype === 'image/jpg' ||
-                    file.mimetype === 'image/svg+xml' ||
-                    file.mimetype === 'image/svg' ||
-                    file.mimetype === 'image/gif'
-                ) {
-                    cb(null, true)
-                } else cb(new Error('le fichier doit être au format png,jpeg,jpg,gif.'))
-            }
-        });
-        
-    //VIEWS------------------------------------------------------
-    const
-        exphbs = require("express-handlebars"),
-        Handlebars = require("handlebars"),
-        {
-            allowInsecurePrototypeAccess
-        } = require('@handlebars/allow-prototype-access');
-    //const productSchema = require('./models/productmodel');
-    // Handlebars------
-    app.engine('hbs', exphbs({
-        defaultLayout: 'main',
-        extname: 'hbs',
-        handlebars: allowInsecurePrototypeAccess(Handlebars)
-    }));
-    app.set('view engine', 'hbs')
-    // BodyParser------
-    app.use(bodyParser.urlencoded({
-        extended: true
-    }));
-
-    //CONNECT BASE DE DONNEES--------------------------------------------------
-    require('./config/db')
-
-
-    //ROUTES---------------------------------------------------
-    app.use(methodOverride("_method"));
-
-
-    //modele---------------------------------------------------
-    const productSchema = {
-        modele: String,
-        marques: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "marques"
+//ajout image-------------------------------------------------------------
+const storage = multer.diskStorage({
+        destination: (req, file, cb) => {
+            console.log(file);
+            cb(null, './public/uploads')
         },
-        description: String,
-        prix: Number,
-        image: {
-            name: String,
-            originalName: String,
-            path: String,
-            creatAt: Date
+        filename: (req, file, cb) => {
+            cb(null, Date.now() + '_' + file.originalname)
         },
-    }
-    const marquesModel = {
-        type: String
-    };
+    }),
+    //filtre image----------------------
+    upload = multer({
+        storage: storage,
+        /*limits: {
+            fileSize: 1
+        },*/
+        fileFilter: (req, file, cb) => {
+            if (
+                file.mimetype === 'image/png' ||
+                file.mimetype === 'image/jpeg' ||
+                file.mimetype === 'image/jpg' ||
+                file.mimetype === 'image/svg+xml' ||
+                file.mimetype === 'image/svg' ||
+                file.mimetype === 'image/gif'
+            ) {
+                cb(null, true)
+            } else cb(new Error('le fichier doit être au format png,jpeg,jpg,gif.'))
+        }
+    });
 
-    const product = mongoose.model("product", productSchema);
-    const marques = mongoose.model("marques", marquesModel);
-    
+//VIEWS-------------------------------------------------------------
+const
+    exphbs = require("express-handlebars"),
+    Handlebars = require("handlebars"),
+    {
+        allowInsecurePrototypeAccess
+    } = require('@handlebars/allow-prototype-access');
+//const productSchema = require('./models/productmodel');
+// Handlebars-------------------------------------------------------------
+app.engine('hbs', exphbs({
+    defaultLayout: 'main',
+    extname: 'hbs',
+    handlebars: allowInsecurePrototypeAccess(Handlebars)
+}));
+app.set('view engine', 'hbs')
+// BodyParser-------------------------------------------------------------
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 
-    //route admin---------------------
-    app.route("/admin")
+//CONNECT BASE DE DONNEES-------------------------------------------------------------
+require('./config/db')
+
+
+//ROUTES-------------------------------------------------------------
+app.use(methodOverride("_method"));
+
+
+//modele-------------------------------------------------------------
+const productSchema = {
+    modele: String,
+    marques: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "marques"
+    },
+    description: String,
+    prix: Number,
+    image: {
+        name: String,
+        originalName: String,
+        path: String,
+        creatAt: Date
+    },
+}
+const marquesModel = {
+    type: String
+};
+
+const product = mongoose.model("product", productSchema);
+const marques = mongoose.model("marques", marquesModel);
+
+
+//route admin-------------------------------------------------------------
+app.route("/admin")
+//VISUEL----------------------
     .get((req, res) => {
         product
             .find()
             .populate("marques")
             .exec((err, docs) => {
                 if (!err) {
-
                     marques.find((err, cat) => {
                         res.render('admin', {
                             product: docs,
                             marques: cat
                         })
                     })
-
-
                 } else {
                     res.send('err')
                 }
@@ -119,39 +115,37 @@
     })
 
 
+//AJOUTER UN PRODUIT----------------------
+    .post(upload.single('image'), (req, res) => {
+        const file = req.file;
 
-        .post(upload.single('image'), (req, res) => {
-            const file = req.file;
-
-            const newProduct = new product({
-                modele: req.body.modele,
-                description: req.body.description,
-                prix: req.body.prix,
-                marques: req.body.marques
-            });
-            if (file) {
-                newProduct.image = {
-                    name: file.filename,
-                    originalname: file.originalname,
-                    path: file.path.replace("public", ""),
-                    creatAt: Date.now()
-                }
-            }
-            newProduct.save((err) => {
-                if (!err) {
-                    res.redirect("/admin")
-                    
-                } else {
-                    res.send(err)
-                }
-            })
+        const newProduct = new product({
+            modele: req.body.modele,
+            description: req.body.description,
+            prix: req.body.prix,
+            marques: req.body.marques
         });
+        if (file) {
+            newProduct.image = {
+                name: file.filename,
+                originalname: file.originalname,
+                path: file.path.replace("public", ""),
+                creatAt: Date.now()
+            }
+        }
+        newProduct.save((err) => {
+            if (!err) {
+                res.redirect("/admin")
+            } else {
+                res.send(err)
+            }
+        })
+    });
 
-// route marques--------------------------------------------
+// route marques-------------------------------------------------------------
 app.route("/marques")
+//VISUEL----------------------
     .get((req, res) => {
-
-
         marques.find((err, cat) => {
             if (!err) {
                 res.render('marques', {
@@ -162,7 +156,7 @@ app.route("/marques")
             }
         })
     })
-
+//AJOUTER UNE MARQUES----------------------
     .post((req, res) => {
         const newMarques = new marques({
             type: req.body.type
@@ -174,8 +168,9 @@ app.route("/marques")
         });
     });
 
-//route ID--------------------------------------------
+//route ID-------------------------------------------------------------
 app.route('/:id')
+//VISUEL----------------------
     .get((req, res) => {
         product.findOne({
             _id: req.params.id
@@ -189,25 +184,21 @@ app.route('/:id')
                         marques: cat,
                     })
                 })
-
             } else {
                 res.send(err)
             }
         })
     })
 
-    //METTRE A JOUR-------- 
+    //METTRE A JOUR---------------------- 
     .put((req, res) => {
-        product.updateOne(
-            {
+        product.updateOne({
                 _id: req.params.id
-            },
-            {
+            }, {
                 modele: req.body.modele,
                 price: req.body.price,
                 marques: req.body.marques,
-            },
-            {
+            }, {
                 multi: true
             },
             (err) => {
@@ -219,48 +210,66 @@ app.route('/:id')
             }
         )
     })
-
+//SUPPRIMER UN SEUL OBJET----------------------
     .delete((req, res) => {
         product.deleteOne({
             _id: req.params.id
         }, (err, ) => {
             if (!err) {
                 res.redirect('/admin')
-
             } else {
                 res.send(err)
             }
         })
     });
-
-        //route admin---------------------
-        app.route("/")
-        .get((req, res) => {
-            product
-                .find()
-                .populate("marques")
-                .exec((err, docs) => {
-                    if (!err) {
     
-                        marques.find((err, cat) => {
-                            res.render('index', {
-                                product: docs,
-                                marques: cat
-                            })
+//route index-------------------------------------------------------------
+app.route("/")
+//VISUEL----------------------
+    .get((req, res) => {
+        product
+            .find()
+            .populate("marques")
+            .exec((err, docs) => {
+                if (!err) {
+
+                    marques.find((err, cat) => {
+                        res.render('index', {
+                            product: docs,
+                            marques: cat
                         })
-    
-    
-                    } else {
-                        res.send('err')
-                    }
-                })
-        })
-    
+                    })
+                } else {
+                    res.send('err')
+                }
+            })
+    });
 
-    //OUVRE LE PORT 3000--------------------------------------------
-    app.listen(port, function () {
-        console.log(`écoute le port ${port}`);
+//route PANIER-------------------------------------------------------------
+app.route("/panier")
+//VISUEL----------------------
+    .get((req, res) => {
+        product
+            .find()
+            .populate("marques")
+            .exec((err, docs) => {
+                if (!err) {
+                    marques.find((err, cat) => {
+                        res.render('panier', {
+                            product: docs,
+                            marques: cat
+                        })
+                    })
+                } else {
+                    res.send('err')
+                }
+            })
+    });
 
-    })
 
-    
+
+//OUVRE LE PORT 3000-------------------------------------------------------------
+app.listen(port, function () {
+    console.log(`écoute le port ${port}`);
+
+})
