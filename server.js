@@ -1,3 +1,5 @@
+
+
     const
         express = require('express'),
         app = express(),
@@ -40,6 +42,7 @@
                 } else cb(new Error('le fichier doit être au format png,jpeg,jpg,gif.'))
             }
         });
+        
     //VIEWS------------------------------------------------------
     const
         exphbs = require("express-handlebars"),
@@ -90,7 +93,7 @@
 
     const product = mongoose.model("product", productSchema);
     const marques = mongoose.model("marques", marquesModel);
-
+    
 
     //route admin---------------------
     app.route("/admin")
@@ -137,6 +140,7 @@
             newProduct.save((err) => {
                 if (!err) {
                     res.redirect("/admin")
+                    
                 } else {
                     res.send(err)
                 }
@@ -195,21 +199,17 @@ app.route('/:id')
     //METTRE A JOUR-------- 
     .put((req, res) => {
         product.updateOne(
-            //condition------------
             {
                 _id: req.params.id
             },
-            //update------------
             {
                 modele: req.body.modele,
                 price: req.body.price,
                 marques: req.body.marques,
             },
-            //option------------
             {
                 multi: true
             },
-
             (err) => {
                 if (!err) {
                     res.redirect('/admin')
@@ -233,8 +233,12 @@ app.route('/:id')
         })
     });
 
+    
+
     //OUVRE LE PORT 3000--------------------------------------------
     app.listen(port, function () {
         console.log(`écoute le port ${port}`);
 
     })
+
+    
