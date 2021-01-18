@@ -14,7 +14,6 @@ app.use(express.static(__dirname + "/public"));
 //ajout image-------------------------------------------------------------
 const storage = multer.diskStorage({
         destination: (req, file, cb) => {
-            console.log(file);
             cb(null, './public/uploads')
         },
         filename: (req, file, cb) => {
@@ -95,7 +94,7 @@ const marques = mongoose.model("marques", marquesModel);
 
 //route admin-------------------------------------------------------------
 app.route("/admin")
-//VISUEL----------------------
+    //VISUEL----------------------
     .get((req, res) => {
         product
             .find()
@@ -115,7 +114,7 @@ app.route("/admin")
     })
 
 
-//AJOUTER UN PRODUIT----------------------
+    //AJOUTER UN PRODUIT----------------------
     .post(upload.single('image'), (req, res) => {
         const file = req.file;
 
@@ -144,7 +143,7 @@ app.route("/admin")
 
 // route marques-------------------------------------------------------------
 app.route("/marques")
-//VISUEL----------------------
+    //VISUEL----------------------
     .get((req, res) => {
         marques.find((err, cat) => {
             if (!err) {
@@ -156,7 +155,7 @@ app.route("/marques")
             }
         })
     })
-//AJOUTER UNE MARQUES----------------------
+    //AJOUTER UNE MARQUES----------------------
     .post((req, res) => {
         const newMarques = new marques({
             type: req.body.type
@@ -170,7 +169,7 @@ app.route("/marques")
 
 //route ID-------------------------------------------------------------
 app.route('/:id')
-//VISUEL----------------------
+    //VISUEL----------------------
     .get((req, res) => {
         product.findOne({
             _id: req.params.id
@@ -192,14 +191,29 @@ app.route('/:id')
     })
 
     //METTRE A JOUR---------------------- 
-    .put((req, res) => {
+    .put(upload.single('image'), (req, res) => {
+        /*if (file) {
+            newProduct.image = {
+                name: file.filename,
+                originalname: file.originalname,
+                path: file.path.replace("public", ""),
+                creatAt: Date.now()
+            }
+        }*/
+        const file = req.file;
+        const imageUpload = {
+            name: file.filename,
+            originalname: file.originalname,
+            path: file.path.replace("public", ""),
+            creatAt: Date.now()
+        }
         product.updateOne({
                 _id: req.params.id
             }, {
                 modele: req.body.modele,
                 price: req.body.price,
                 marques: req.body.marques,
-                image: req.file.image
+                image: imageUpload
             }, {
                 multi: true
             },
@@ -212,7 +226,7 @@ app.route('/:id')
             }
         )
     })
-//SUPPRIMER UN SEUL OBJET----------------------
+    //SUPPRIMER UN SEUL OBJET----------------------
     .delete((req, res) => {
         product.deleteOne({
             _id: req.params.id
@@ -224,10 +238,10 @@ app.route('/:id')
             }
         })
     });
-    
+
 //route index-------------------------------------------------------------
 app.route("/")
-//VISUEL----------------------
+    //VISUEL----------------------
     .get((req, res) => {
         product
             .find()
@@ -248,7 +262,7 @@ app.route("/")
 
 //route PANIER-------------------------------------------------------------
 app.route("/panier")
-//VISUEL----------------------
+    //VISUEL----------------------
     .get((req, res) => {
         product
             .find()
