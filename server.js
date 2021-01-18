@@ -175,6 +175,7 @@ app.route('/:id')
         product.findOne({
             _id: req.params.id
         }, (err, docs) => {
+
             if (!err) {
                 marques.find((err, cat) => {
                     res.render('edition', {
@@ -198,6 +199,7 @@ app.route('/:id')
                 modele: req.body.modele,
                 price: req.body.price,
                 marques: req.body.marques,
+                image: req.file.image
             }, {
                 multi: true
             },
@@ -232,7 +234,6 @@ app.route("/")
             .populate("marques")
             .exec((err, docs) => {
                 if (!err) {
-
                     marques.find((err, cat) => {
                         res.render('index', {
                             product: docs,
